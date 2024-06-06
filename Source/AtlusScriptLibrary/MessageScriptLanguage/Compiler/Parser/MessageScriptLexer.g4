@@ -7,6 +7,13 @@ lexer grammar MessageScriptLexer;
 ////////////////////
 
 //
+// Escape character
+//
+
+EscapeSequence
+    : '\\' -> pushMode( EscapeMode );
+
+//
 // Text lexer rules
 //
 
@@ -16,8 +23,11 @@ OpenCode
 CloseText
 	: ']' -> pushMode( MessageScriptCode );  // close tag is used for closing inline text inside tag
 
-// match actual text
 Text
+    : ( PlainText | EscapedText ) ;
+
+// match actual text
+PlainText
 	: ~( '[' | ']' )+
 	;
 
@@ -90,3 +100,11 @@ Sign
 
 Whitespace
 	: [ \t\r\n] -> skip;
+
+mode EscapeMode;
+
+EscapedText
+    : ~( [ \t\r\n] )+ ;
+
+EscapeClose
+    : [ \t\r\n] -> popMode ;
